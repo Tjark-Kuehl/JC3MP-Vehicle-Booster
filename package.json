@@ -1,6 +1,8 @@
 {
   "name": "vehicle-boost",
-  "description": "A vehicle boost",
+  "version": "1.0.0",
+  "description": "",
   "main": "main.js",
-  "author": "Tjark 'Sam' Kühl"
+  "author": "Tjark 'Sam' Kühl",
+  "license": "ISC"
 }
