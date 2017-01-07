@@ -1,0 +1,6 @@
+{
+  "name": "vehicle-boost",
+  "description": "A vehicle boost",
+  "main": "main.js",
+  "author": "Tjark 'Sam' Kühl"
+}
