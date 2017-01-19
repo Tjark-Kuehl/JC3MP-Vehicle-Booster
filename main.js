@@ -2,7 +2,6 @@
 
 const cfg = require("./config.json");
 const epsilon = 0.35;
-const nepsilon = -epsilon;
 const piOver2 = Math.PI * 0.5;
 
 //>> Init settings
@@ -19,28 +18,20 @@ const multiply = typeof cfg.boostMultiply !== "undefined" ? cfg.boostMultiply : 
 const boostSecure = typeof cfg.boostSecure !== "undefined" ? cfg.boostSecure : true;
 
 jcmp.events.AddRemoteCallable("boost_vehicle", (player) => {
-    let veh = player.vehicle;
+    let v = player.vehicle;
     if (typeof player.vehicle !== "undefined") {
         if(boostSecure) {
-            let f = AngleHorizontal(veh.linearVelocity)
-                  - AngleHorizontal(new Vector3f(Math.cos(veh.rotation.y + piOver2),
-                                                 0,
-                                                 Math.sin(veh.rotation.y + piOver2)));
+            let posV = new Vector3f(Math.cos(v.rotation.y + piOver2), 0, Math.sin(v.rotation.y + piOver2));
+            let f = AngleHorizontal(v.linearVelocity) - AngleHorizontal(posV);
 
-            if((f < 0 && f > nepsilon) || (f > 0 && f < epsilon)) {
-                veh.linearVelocity = new Vector3f(veh.linearVelocity.x * multiply,
-                                                  boostY ? veh.linearVelocity.y * multiply : veh.linearVelocity.y,
-                                                  veh.linearVelocity.z * multiply);
+            if((f < 0 && f > -epsilon) || (f > 0 && f < epsilon)) {
+                BoostVehicle(v);
             }
         }
-        else {
-            veh.linearVelocity = new Vector3f(veh.linearVelocity.x * multiply,
-                                                 boostY ? veh.linearVelocity.y * multiply : veh.linearVelocity.y,
-                                                 veh.linearVelocity.z * multiply);
-        }
+        else { BoostVehicle(v); }
 
         if (invincibleVeh) {
-            veh.health = 10000;
+            v.health = 10000;
         }
     }
 });
@@ -50,9 +41,12 @@ jcmp.events.AddRemoteCallable("getBoostKey", (player) => {
     jcmp.events.CallRemote("sendBoostKey", player, boostKey);
 });
 
-const xAxis = new Vector3f(1, 0, 0);
-const xAxisl = Math.sqrt((xAxis.x * xAxis.x) + (xAxis.z * xAxis.z));
+function BoostVehicle(v) {
+    v.linearVelocity = new Vector3f(v.linearVelocity.x * multiply,
+                                    boostY ? v.linearVelocity.y * multiply : v.linearVelocity.y,
+                                    v.linearVelocity.z * multiply);
+}
+
 function AngleHorizontal(vec3) {
-    return Math.acos(((vec3.x * xAxis.x) + (vec3.z * xAxis.z)) /
-                     (Math.sqrt((vec3.x * vec3.x) + (vec3.z * vec3.z)) * xAxisl));
+    return Math.acos(vec3.x / (Math.sqrt((vec3.x * vec3.x) + (vec3.z * vec3.z))));
 }
